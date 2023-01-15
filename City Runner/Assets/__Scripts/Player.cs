@@ -4,22 +4,26 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("Movement Parameters")]
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpForce;
 
-    [Header("Checks")]
+    [Header("Checks Collisions")]
     [SerializeField] Transform groundCheckTransform;
     [SerializeField] float groundCheckRadius;
     [SerializeField] LayerMask whatIsGround;
 
     private Rigidbody2D rb;
+    private Animator animator;
 
     private bool canRun;
-    private bool grounded;
+    private bool isGrounded;
+    private bool isRunning;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -29,6 +33,16 @@ public class Player : MonoBehaviour
 
         CheckForRun();
         CheckForJump();
+
+        HandleAnimations();
+        CheckForCollisions();
+    }
+
+    private void HandleAnimations()
+    {
+        animator.SetFloat("yVelocity", rb.velocity.y);
+        animator.SetBool("IsRunning", isRunning);
+        animator.SetBool("IsGrounded", isGrounded);
     }
 
     private void CheckForRun()
@@ -37,15 +51,22 @@ public class Player : MonoBehaviour
         {
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
         }
+
+        if (rb.velocity.x > 0)
+        {
+            isRunning = true;
+        }
+        else
+        {
+            isRunning = false;
+        }
     }
 
     private void CheckForJump()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            grounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, whatIsGround);
-
-            if (grounded)
+            if (isGrounded)
             {
                 Jump();
             }
@@ -55,6 +76,11 @@ public class Player : MonoBehaviour
     private void Jump()
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    }
+
+    private void CheckForCollisions()
+    {
+        isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, whatIsGround);
     }
 
     private void OnDrawGizmos()
