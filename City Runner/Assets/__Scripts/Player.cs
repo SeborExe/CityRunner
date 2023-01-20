@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,8 @@ public class Player : MonoBehaviour
     [Header("Movement Parameters")]
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpForce;
+    [SerializeField] float doubleJumpForce;
+    [SerializeField] float slideSpeedMultiplier;
 
     [Header("Checks Collisions")]
     [SerializeField] Transform groundCheckTransform;
@@ -19,6 +22,13 @@ public class Player : MonoBehaviour
     private bool canRun;
     private bool isGrounded;
     private bool isRunning;
+    private bool canDoubleJump;
+    private bool isSliding;
+    private bool canSlide;
+
+    [SerializeField] private float slidingTime;
+    [SerializeField] private float slidingCooldown;
+    private float slidingTimer;
 
     private void Awake()
     {
@@ -33,6 +43,7 @@ public class Player : MonoBehaviour
 
         CheckForRun();
         CheckForJump();
+        CheckForSlide();
 
         HandleAnimations();
         CheckForCollisions();
@@ -43,11 +54,17 @@ public class Player : MonoBehaviour
         animator.SetFloat("yVelocity", rb.velocity.y);
         animator.SetBool("IsRunning", isRunning);
         animator.SetBool("IsGrounded", isGrounded);
+        animator.SetBool("IsSliding", isSliding);
     }
 
     private void CheckForRun()
     {
-        if (canRun)
+        if (isSliding)
+        {
+            rb.velocity = new Vector2(moveSpeed * slideSpeedMultiplier, rb.velocity.y);
+        }
+
+        else if (canRun)
         {
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
         }
@@ -68,14 +85,46 @@ public class Player : MonoBehaviour
         {
             if (isGrounded)
             {
-                Jump();
+                Jump(jumpForce);
             }
+            else if (canDoubleJump)
+            {
+                Jump(doubleJumpForce);
+                canDoubleJump = false;
+            }
+        }
+
+        if (isGrounded)
+        {
+            canDoubleJump = true;
         }
     }
 
-    private void Jump()
+    private void CheckForSlide()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        if (!isGrounded) return;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canRun)
+        {
+            isSliding = true;
+            canSlide = false;
+            slidingTimer = Time.time;
+        }
+
+        if (Time.time > slidingTimer + slidingTime)
+        {
+            isSliding = false;
+        }
+
+        if (Time.time > slidingTimer + slidingCooldown)
+        {
+            canSlide = true;
+        }
+    }   
+
+    private void Jump(float force)
+    {
+        rb.velocity = new Vector2(rb.velocity.x, force);
     }
 
     private void CheckForCollisions()
