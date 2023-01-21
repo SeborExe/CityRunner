@@ -3543,6 +3543,7 @@ MonoBehaviour:
   - {fileID: 1455086266793575020, guid: 79094d72e7954c44e9294d5097f06e49, type: 3}
   - {fileID: 1455086266793575020, guid: 51e4164e987ccb24587813151fc47d14, type: 3}
   - {fileID: 1455086266793575020, guid: 4ca53760db6bced41833b05c403a4424, type: 3}
+  - {fileID: 1455086266793575020, guid: e58ffe9f4a4c5364eb3d656b20da514e, type: 3}
   player: {fileID: 2060487350}
   nextPartPosition: {x: -5, y: -2, z: 0}
   partDrawDistance: 25
@@ -7239,6 +7240,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1492660489
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1492660490}
+  m_Layer: 0
+  m_Name: WallCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1492660490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492660489}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.4, y: -0.8, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2060487349}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1547552236
 GameObject:
   m_ObjectHideFlags: 0
@@ -9045,7 +9077,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 2060487345}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 219e68eb69bcd6c43bb315f40e538a9c, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -9148,6 +9180,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 382737020}
+  - {fileID: 1492660490}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9167,13 +9200,18 @@ MonoBehaviour:
   jumpForce: 18
   doubleJumpForce: 13
   slideSpeedMultiplier: 1.3
+  maxMoveSpeed: 25
   groundCheckTransform: {fileID: 382737020}
+  wallCheckTransform: {fileID: 1492660490}
   groundCheckRadius: 0.15
+  wallCheckDistance: 0.4
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
   slidingTime: 0.4
   slidingCooldown: 1.5
+  speedMultiplier: 1.15
+  speedIncreaseMilestone: 50
 --- !u!95 &2060487351
 Animator:
   serializedVersion: 4

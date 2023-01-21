@@ -10,10 +10,13 @@ public class Player : MonoBehaviour
     [SerializeField] float jumpForce;
     [SerializeField] float doubleJumpForce;
     [SerializeField] float slideSpeedMultiplier;
+    [SerializeField] float maxMoveSpeed;
 
     [Header("Checks Collisions")]
     [SerializeField] Transform groundCheckTransform;
+    [SerializeField] Transform wallCheckTransform;
     [SerializeField] float groundCheckRadius;
+    [SerializeField] float wallCheckDistance;
     [SerializeField] LayerMask whatIsGround;
 
     private Rigidbody2D rb;
@@ -21,6 +24,7 @@ public class Player : MonoBehaviour
 
     private bool canRun;
     private bool isGrounded;
+    private bool isWallDetected;
     private bool isRunning;
     private bool canDoubleJump;
     private bool isSliding;
@@ -28,12 +32,23 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float slidingTime;
     [SerializeField] private float slidingCooldown;
+    [SerializeField] private float speedMultiplier;
+    [SerializeField] private float speedIncreaseMilestone;
+
     private float slidingTimer;
+    private float speedMilestone;
+    private float defaultMoveSpeed;
+    private float defaultMilestoneSpeed;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+        SetDefaltueVelues();
     }
 
     private void Update()
@@ -44,6 +59,7 @@ public class Player : MonoBehaviour
         CheckForRun();
         CheckForJump();
         CheckForSlide();
+        CheckForSpeedingUp();
 
         HandleAnimations();
         CheckForCollisions();
@@ -59,7 +75,12 @@ public class Player : MonoBehaviour
 
     private void CheckForRun()
     {
-        if (isSliding)
+        if (isWallDetected)
+        {
+            SpeedReset();
+        }
+
+        else if (isSliding)
         {
             rb.velocity = new Vector2(moveSpeed * slideSpeedMultiplier, rb.velocity.y);
         }
@@ -76,6 +97,19 @@ public class Player : MonoBehaviour
         else
         {
             isRunning = false;
+        }
+    }
+
+    private void CheckForSpeedingUp()
+    {
+        if (transform.position.x > speedMilestone)
+        {
+            speedMilestone += speedIncreaseMilestone;
+            moveSpeed *= speedMultiplier;
+            speedIncreaseMilestone *= speedMultiplier;
+
+            if (moveSpeed > maxMoveSpeed)
+                moveSpeed = maxMoveSpeed;
         }
     }
 
@@ -104,7 +138,7 @@ public class Player : MonoBehaviour
     {
         if (!isGrounded) return;
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && canRun)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canSlide)
         {
             isSliding = true;
             canSlide = false;
@@ -120,20 +154,36 @@ public class Player : MonoBehaviour
         {
             canSlide = true;
         }
-    }   
+    }
+
+    private void SetDefaltueVelues()
+    {
+        defaultMoveSpeed = moveSpeed;
+        defaultMilestoneSpeed = speedIncreaseMilestone;
+        speedMilestone = speedIncreaseMilestone;
+    }
 
     private void Jump(float force)
     {
         rb.velocity = new Vector2(rb.velocity.x, force);
     }
 
+    private void SpeedReset()
+    {
+        moveSpeed = defaultMoveSpeed;
+        speedIncreaseMilestone = defaultMilestoneSpeed;
+    }
+
     private void CheckForCollisions()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, whatIsGround);
+        isWallDetected = Physics2D.Raycast(wallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(groundCheckTransform.position, groundCheckRadius);
+        Gizmos.DrawLine(wallCheckTransform.position, new Vector3(wallCheckTransform.position.x + wallCheckDistance, wallCheckTransform.position.y, 
+            wallCheckTransform.position.z));
     }
 }
