@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
 
     [Header("Checks Collisions")]
     [SerializeField] Transform groundCheckTransform;
+    [SerializeField] Transform bottomWallCheckTransform;
+    [SerializeField] Transform ledgeCheckTransform;
     [SerializeField] Transform wallCheckTransform;
     [SerializeField] float groundCheckRadius;
     [SerializeField] float wallCheckDistance;
@@ -24,11 +26,15 @@ public class Player : MonoBehaviour
 
     private bool canRun;
     private bool isGrounded;
-    private bool isWallDetected;
+    private bool isBottomWallDetected;
     private bool isRunning;
     private bool canDoubleJump;
     private bool isSliding;
     private bool canSlide;
+    private bool isTouchingLedge;
+    private bool isWallDetected;
+    private bool isLedgeDetected;
+    private bool canClimbLedge;
 
     [SerializeField] private float slidingTime;
     [SerializeField] private float slidingCooldown;
@@ -39,6 +45,14 @@ public class Player : MonoBehaviour
     private float speedMilestone;
     private float defaultMoveSpeed;
     private float defaultMilestoneSpeed;
+
+    private Vector2 ledgePosBot;
+    private Vector2 ledgePos1; // position to hold player before animation end
+    private Vector2 ledgePos2; // position where to move player after animation end
+    [SerializeField] float ledgeClimbe_Xoffset1 = 0f;
+    [SerializeField] float ledgeClimbe_Xoffset2 = 0f;
+    [SerializeField] float ledgeClimbe_Yoffset1 = 0f;
+    [SerializeField] float ledgeClimbe_Yoffset2 = 0f;
 
     private void Awake()
     {
@@ -60,6 +74,7 @@ public class Player : MonoBehaviour
         CheckForJump();
         CheckForSlide();
         CheckForSpeedingUp();
+        CheckForLedgeClimb();
 
         HandleAnimations();
         CheckForCollisions();
@@ -71,23 +86,26 @@ public class Player : MonoBehaviour
         animator.SetBool("IsRunning", isRunning);
         animator.SetBool("IsGrounded", isGrounded);
         animator.SetBool("IsSliding", isSliding);
+        animator.SetBool("CanClimbeLedge", canClimbLedge);
     }
 
     private void CheckForRun()
     {
-        if (isWallDetected)
+        if (canRun)
         {
-            SpeedReset();
-        }
+            if (isBottomWallDetected)
+            {
+                SpeedReset();
+            }
 
-        else if (isSliding)
-        {
-            rb.velocity = new Vector2(moveSpeed * slideSpeedMultiplier, rb.velocity.y);
-        }
-
-        else if (canRun)
-        {
-            rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+            else if (isSliding)
+            {
+                rb.velocity = new Vector2(moveSpeed * slideSpeedMultiplier, rb.velocity.y);
+            }
+            else
+            {
+                rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+            }
         }
 
         if (rb.velocity.x > 0)
@@ -156,6 +174,32 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void CheckForLedgeClimb()
+    {
+        if (isLedgeDetected && !canClimbLedge)
+        {
+            canClimbLedge = true;
+
+            ledgePos1 = new Vector2((ledgePosBot.x + wallCheckDistance) + ledgeClimbe_Xoffset1, (ledgePosBot.y) + ledgeClimbe_Yoffset1);
+            ledgePos2 = new Vector2(ledgePosBot.x + wallCheckDistance + ledgeClimbe_Xoffset2, (ledgePosBot.y) + ledgeClimbe_Yoffset2);
+
+            canRun = false;
+        }
+
+        if (canClimbLedge)
+        {
+            transform.position = ledgePos1;
+        }
+    }
+
+    private void CheckIfLedgeClimbeFinished()
+    {
+        transform.position = ledgePos2;
+        canClimbLedge = false;
+        canRun = true;
+        isLedgeDetected = false;
+    }
+
     private void SetDefaltueVelues()
     {
         defaultMoveSpeed = moveSpeed;
@@ -177,13 +221,28 @@ public class Player : MonoBehaviour
     private void CheckForCollisions()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, whatIsGround);
+        isBottomWallDetected = Physics2D.Raycast(bottomWallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
+
+        isTouchingLedge = Physics2D.Raycast(ledgeCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
         isWallDetected = Physics2D.Raycast(wallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
+
+        if (isWallDetected && !isTouchingLedge && !isLedgeDetected)
+        {
+            isLedgeDetected = true;
+            ledgePosBot = wallCheckTransform.position;
+        }
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(groundCheckTransform.position, groundCheckRadius);
-        Gizmos.DrawLine(wallCheckTransform.position, new Vector3(wallCheckTransform.position.x + wallCheckDistance, wallCheckTransform.position.y, 
+        Gizmos.DrawLine(bottomWallCheckTransform.position, new Vector3(bottomWallCheckTransform.position.x + wallCheckDistance, bottomWallCheckTransform.position.y, 
+            bottomWallCheckTransform.position.z));
+
+        Gizmos.DrawLine(wallCheckTransform.position, new Vector3(wallCheckTransform.position.x + wallCheckDistance, wallCheckTransform.position.y,
             wallCheckTransform.position.z));
+
+        Gizmos.DrawLine(ledgeCheckTransform.position, new Vector3(ledgeCheckTransform.position.x + wallCheckDistance, ledgeCheckTransform.position.y,
+             ledgeCheckTransform.position.z));
     }
 }
