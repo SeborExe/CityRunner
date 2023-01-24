@@ -86,6 +86,7 @@ public class Player : MonoBehaviour
 
     private void HandleAnimations()
     {
+        animator.SetFloat("xVelocity", rb.velocity.x);
         animator.SetFloat("yVelocity", rb.velocity.y);
         animator.SetBool("IsRunning", isRunning);
         animator.SetBool("IsGrounded", isGrounded);

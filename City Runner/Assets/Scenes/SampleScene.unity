@@ -9293,11 +9293,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48474d902a6b94e4fa83d4b0cf433df7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 12
+  moveSpeed: 11
   jumpForce: 18
   doubleJumpForce: 13
   slideSpeedMultiplier: 1.3
-  maxMoveSpeed: 25
+  maxMoveSpeed: 20
   minVelocityToRoll: -25
   groundCheckTransform: {fileID: 382737020}
   bottomWallCheckTransform: {fileID: 1492660490}
