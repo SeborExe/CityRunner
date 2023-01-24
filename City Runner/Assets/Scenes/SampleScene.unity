@@ -4713,6 +4713,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1085134874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1085134875}
+  m_Layer: 0
+  m_Name: CeilingCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1085134875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1085134874}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2060487349}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1087391242
 GameObject:
   m_ObjectHideFlags: 0
@@ -9246,6 +9277,7 @@ Transform:
   - {fileID: 349160432}
   - {fileID: 699943644}
   - {fileID: 1492660490}
+  - {fileID: 1085134875}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9266,15 +9298,18 @@ MonoBehaviour:
   doubleJumpForce: 13
   slideSpeedMultiplier: 1.3
   maxMoveSpeed: 25
+  minVelocityToRoll: -25
   groundCheckTransform: {fileID: 382737020}
   bottomWallCheckTransform: {fileID: 1492660490}
   ledgeCheckTransform: {fileID: 349160432}
   wallCheckTransform: {fileID: 699943644}
+  ceilingCheckTransform: {fileID: 1085134875}
   groundCheckRadius: 0.15
   wallCheckDistance: 0.4
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
+  canRoll: 0
   slidingTime: 0.4
   slidingCooldown: 1.5
   speedMultiplier: 1.15

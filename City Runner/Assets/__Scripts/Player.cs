@@ -11,12 +11,14 @@ public class Player : MonoBehaviour
     [SerializeField] float doubleJumpForce;
     [SerializeField] float slideSpeedMultiplier;
     [SerializeField] float maxMoveSpeed;
+    [SerializeField] float minVelocityToRoll;
 
     [Header("Checks Collisions")]
     [SerializeField] Transform groundCheckTransform;
     [SerializeField] Transform bottomWallCheckTransform;
     [SerializeField] Transform ledgeCheckTransform;
     [SerializeField] Transform wallCheckTransform;
+    [SerializeField] Transform ceilingCheckTransform;
     [SerializeField] float groundCheckRadius;
     [SerializeField] float wallCheckDistance;
     [SerializeField] LayerMask whatIsGround;
@@ -31,10 +33,12 @@ public class Player : MonoBehaviour
     private bool canDoubleJump;
     private bool isSliding;
     private bool canSlide;
+    [SerializeField] private bool canRoll = false;
     private bool isTouchingLedge;
     private bool isWallDetected;
     private bool isLedgeDetected;
     private bool canClimbLedge;
+    private bool isCeilingDetected;
 
     [SerializeField] private float slidingTime;
     [SerializeField] private float slidingCooldown;
@@ -87,13 +91,26 @@ public class Player : MonoBehaviour
         animator.SetBool("IsGrounded", isGrounded);
         animator.SetBool("IsSliding", isSliding);
         animator.SetBool("CanClimbeLedge", canClimbLedge);
+        animator.SetBool("CanDoubleJump", canDoubleJump);
+        animator.SetBool("CanRoll", canRoll);
+
+
+        if (canClimbLedge)
+        {
+            canRoll = false;
+        }
+
+        else if (rb.velocity.y < minVelocityToRoll)
+        {
+            canRoll = true;
+        }
     }
 
     private void CheckForRun()
     {
         if (canRun)
         {
-            if (isBottomWallDetected)
+            if (isBottomWallDetected || isWallDetected && !isSliding)
             {
                 SpeedReset();
             }
@@ -138,6 +155,7 @@ public class Player : MonoBehaviour
             if (isGrounded)
             {
                 Jump(jumpForce);
+                canRoll = false;
             }
             else if (canDoubleJump)
             {
@@ -156,14 +174,14 @@ public class Player : MonoBehaviour
     {
         if (!isGrounded) return;
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && canSlide)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canSlide && rb.velocity.x > defaultMoveSpeed)
         {
             isSliding = true;
             canSlide = false;
             slidingTimer = Time.time;
         }
 
-        if (Time.time > slidingTimer + slidingTime)
+        if (Time.time > slidingTimer + slidingTime && !isCeilingDetected)
         {
             isSliding = false;
         }
@@ -200,6 +218,11 @@ public class Player : MonoBehaviour
         isLedgeDetected = false;
     }
 
+    private void RollAnimationFinished()
+    {
+        canRoll = false;
+    }
+
     private void SetDefaltueVelues()
     {
         defaultMoveSpeed = moveSpeed;
@@ -222,6 +245,7 @@ public class Player : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, whatIsGround);
         isBottomWallDetected = Physics2D.Raycast(bottomWallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
+        isCeilingDetected = Physics2D.Raycast(ceilingCheckTransform.position, Vector2.up, wallCheckDistance + 0.5f, whatIsGround); ;
 
         isTouchingLedge = Physics2D.Raycast(ledgeCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
         isWallDetected = Physics2D.Raycast(wallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
@@ -230,6 +254,7 @@ public class Player : MonoBehaviour
         {
             isLedgeDetected = true;
             ledgePosBot = wallCheckTransform.position;
+            rb.velocity = new Vector2(rb.velocity.x, 0f);
         }
     }
 
@@ -244,5 +269,8 @@ public class Player : MonoBehaviour
 
         Gizmos.DrawLine(ledgeCheckTransform.position, new Vector3(ledgeCheckTransform.position.x + wallCheckDistance, ledgeCheckTransform.position.y,
              ledgeCheckTransform.position.z));
+
+        Gizmos.DrawLine(ceilingCheckTransform.position, new Vector3(ceilingCheckTransform.position.x, ceilingCheckTransform.position.y + wallCheckDistance,
+            ceilingCheckTransform.position.z));
     }
 }
