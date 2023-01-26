@@ -58,6 +58,9 @@ public class Player : MonoBehaviour
     [SerializeField] float ledgeClimbe_Yoffset1 = 0f;
     [SerializeField] float ledgeClimbe_Yoffset2 = 0f;
 
+    [Header("Coin Info"), Space(15)]
+    public int coins;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();

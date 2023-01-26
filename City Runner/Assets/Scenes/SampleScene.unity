@@ -3602,7 +3602,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelParts:
+  - {fileID: 1455086266793575020, guid: 51e4164e987ccb24587813151fc47d14, type: 3}
+  - {fileID: 1455086266793575020, guid: 4ca53760db6bced41833b05c403a4424, type: 3}
   - {fileID: 1455086266793575020, guid: e58ffe9f4a4c5364eb3d656b20da514e, type: 3}
+  - {fileID: 1455086266793575020, guid: 79094d72e7954c44e9294d5097f06e49, type: 3}
   player: {fileID: 2060487350}
   nextPartPosition: {x: -5, y: -2, z: 0}
   partDrawDistance: 25
@@ -9318,6 +9321,7 @@ MonoBehaviour:
   ledgeClimbe_Xoffset2: 0.2
   ledgeClimbe_Yoffset1: -1.1
   ledgeClimbe_Yoffset2: 1.35
+  coins: 0
 --- !u!95 &2060487351
 Animator:
   serializedVersion: 4
