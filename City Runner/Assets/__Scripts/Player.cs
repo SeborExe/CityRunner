@@ -33,12 +33,18 @@ public class Player : MonoBehaviour
     private bool canDoubleJump;
     private bool isSliding;
     private bool canSlide;
-    [SerializeField] private bool canRoll = false;
+    private bool canRoll = false;
     private bool isTouchingLedge;
     private bool isWallDetected;
     private bool isLedgeDetected;
     private bool canClimbLedge;
     private bool isCeilingDetected;
+
+    [Header("Knockback")]
+    [SerializeField] private Vector2 knockbackDirection;
+    [SerializeField] private float knockbackPower;
+    private bool canBeKnocked = true;
+    private bool isKnocked;
 
     [SerializeField] private float slidingTime;
     [SerializeField] private float slidingCooldown;
@@ -97,6 +103,7 @@ public class Player : MonoBehaviour
         animator.SetBool("CanClimbeLedge", canClimbLedge);
         animator.SetBool("CanDoubleJump", canDoubleJump);
         animator.SetBool("CanRoll", canRoll);
+        animator.SetBool("IsKnocked", isKnocked);
 
 
         if (canClimbLedge)
@@ -112,6 +119,13 @@ public class Player : MonoBehaviour
 
     private void CheckForRun()
     {
+        if (isKnocked && canBeKnocked)
+        {
+            canBeKnocked = false;
+            canRun = false;
+            rb.velocity = knockbackDirection * knockbackPower;
+        }
+
         if (canRun)
         {
             if (isBottomWallDetected || isWallDetected && !isSliding)
@@ -260,6 +274,23 @@ public class Player : MonoBehaviour
             ledgePosBot = wallCheckTransform.position;
             rb.velocity = new Vector2(rb.velocity.x, 0f);
         }
+    }
+
+    public void Knockback()
+    {
+        if (canBeKnocked)
+        {
+            isKnocked = true;
+        }
+    }
+
+    private void knockbackAnimationFinished()
+    {
+        isKnocked = false;
+        canBeKnocked = true;
+
+        moveSpeed = defaultMoveSpeed;
+        canRun = true;
     }
 
     private void OnDrawGizmos()

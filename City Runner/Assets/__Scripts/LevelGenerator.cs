@@ -10,7 +10,7 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] private Vector3 nextPartPosition;
     [SerializeField] private float partDrawDistance;
 
-    private float partDeleteDistance = 15f;
+    [SerializeField] private float partDeleteDistance = 30f;
 
     private void Update()
     {
@@ -23,9 +23,9 @@ public class LevelGenerator : MonoBehaviour
         while ((nextPartPosition.x - player.transform.position.x) < partDrawDistance)
         {
             Transform part = levelParts[Random.Range(0, levelParts.Count)];
-            Transform newPart = Instantiate(part, nextPartPosition - part.Find("StartPoint").position, Quaternion.identity, transform);
+            Transform newPart = Instantiate(part, nextPartPosition - part.Find("MainLevelPart/StartPoint").position, Quaternion.identity, transform);
 
-            nextPartPosition = newPart.Find("EndPoint").position;
+            nextPartPosition = newPart.Find("MainLevelPart/EndPoint").position;
         }
     }
 

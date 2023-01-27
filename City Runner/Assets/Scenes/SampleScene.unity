@@ -1234,7 +1234,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 309966951}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.462222, y: 3.3999996, z: -10}
+  m_LocalPosition: {x: 9.066667, y: 3.3999996, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2107,16 +2107,16 @@ MonoBehaviour:
   m_YDamping: 1
   m_ZDamping: 1
   m_TargetMovementOnly: 1
-  m_ScreenX: 0.22
+  m_ScreenX: 0.2
   m_ScreenY: 0.7
   m_CameraDistance: 10
-  m_DeadZoneWidth: 0
+  m_DeadZoneWidth: 0.15
   m_DeadZoneHeight: 0.7
   m_DeadZoneDepth: 0
   m_UnlimitedSoftZone: 0
-  m_SoftZoneWidth: 0.8
+  m_SoftZoneWidth: 0.2
   m_SoftZoneHeight: 0.7
-  m_BiasX: 0
+  m_BiasX: -0.00000029802325
   m_BiasY: 0
   m_CenterOnActivate: 1
   m_GroupFramingMode: 2
@@ -2583,7 +2583,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.462222, y: 3.3999996, z: -10}
+  m_LocalPosition: {x: 9.066667, y: 3.3999996, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3602,13 +3602,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelParts:
-  - {fileID: 1455086266793575020, guid: 51e4164e987ccb24587813151fc47d14, type: 3}
-  - {fileID: 1455086266793575020, guid: 4ca53760db6bced41833b05c403a4424, type: 3}
-  - {fileID: 1455086266793575020, guid: e58ffe9f4a4c5364eb3d656b20da514e, type: 3}
   - {fileID: 1455086266793575020, guid: 79094d72e7954c44e9294d5097f06e49, type: 3}
   player: {fileID: 2060487350}
   nextPartPosition: {x: -5, y: -2, z: 0}
-  partDrawDistance: 25
+  partDrawDistance: 30
+  partDeleteDistance: 30
 --- !u!4 &790610379
 Transform:
   m_ObjectHideFlags: 0
@@ -9312,7 +9310,8 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  canRoll: 0
+  knockbackDirection: {x: -2, y: 1}
+  knockbackPower: 5
   slidingTime: 0.4
   slidingCooldown: 1.5
   speedMultiplier: 1.15
