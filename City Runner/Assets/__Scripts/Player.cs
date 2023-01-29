@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] float slideSpeedMultiplier;
     [SerializeField] float maxMoveSpeed;
     [SerializeField] float minVelocityToRoll;
+    [SerializeField] float movementSpeedNeededToSurvive;
 
     [Header("Checks Collisions")]
     [SerializeField] Transform groundCheckTransform;
@@ -25,6 +26,9 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
+    private Coroutine hurtCoroutine;
 
     private bool canRun;
     private bool isGrounded;
@@ -64,13 +68,11 @@ public class Player : MonoBehaviour
     [SerializeField] float ledgeClimbe_Yoffset1 = 0f;
     [SerializeField] float ledgeClimbe_Yoffset2 = 0f;
 
-    [Header("Coin Info"), Space(15)]
-    public int coins;
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
@@ -80,7 +82,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (Input.anyKey)
+        if (Input.anyKey && !isKnocked)
             canRun = true;
 
         CheckForRun();
@@ -168,7 +170,7 @@ public class Player : MonoBehaviour
 
     private void CheckForJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !isKnocked)
         {
             if (isGrounded)
             {
@@ -281,16 +283,52 @@ public class Player : MonoBehaviour
         if (canBeKnocked)
         {
             isKnocked = true;
+            Hurt();
         }
     }
 
     private void knockbackAnimationFinished()
     {
         isKnocked = false;
-        canBeKnocked = true;
 
         moveSpeed = defaultMoveSpeed;
         canRun = true;
+    }
+
+    private void Hurt()
+    {
+        if (hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+        }
+
+        hurtCoroutine = StartCoroutine(hurtRoutine());
+    }
+
+    private IEnumerator hurtRoutine()
+    {
+        Color originalColor = spriteRenderer.color;
+        Color darkenColor = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0.6f);
+
+        for (int i = 0; i < 4; i++)
+        {
+            spriteRenderer.color = darkenColor;
+            yield return new WaitForSeconds(0.2f);
+            spriteRenderer.color = originalColor;
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        canBeKnocked = true;
+        hurtCoroutine = null;
+    }
+    public float GetPlayerMoveSpeed()
+    {
+        return moveSpeed;
+    }
+
+    public float GetMovemenetNeededToSurvive()
+    {
+        return movementSpeedNeededToSurvive;
     }
 
     private void OnDrawGizmos()

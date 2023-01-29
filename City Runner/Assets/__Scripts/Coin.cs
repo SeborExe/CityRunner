@@ -12,7 +12,7 @@ public class Coin : MonoBehaviour
         {
             if (collision.TryGetComponent<Player>(out Player player) && isActive)
             {
-                player.coins++;
+                GameManager.Instance.CoinCollected();
                 isActive = false;
                 this.gameObject.SetActive(false);
             }

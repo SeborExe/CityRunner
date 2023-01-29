@@ -19,7 +19,14 @@ public class Trap : MonoBehaviour
     {
         if (collision.TryGetComponent<Player>(out Player player))
         {
-            player.Knockback();
+            if (player.GetPlayerMoveSpeed() >= player.GetMovemenetNeededToSurvive())
+            {
+                player.Knockback();
+            }
+            else
+            {
+                GameManager.Instance.RestartGame();
+            }
         }
     }
 }
