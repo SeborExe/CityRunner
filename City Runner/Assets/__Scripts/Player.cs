@@ -15,13 +15,13 @@ public class Player : MonoBehaviour
     [SerializeField] float movementSpeedNeededToSurvive;
 
     [Header("Checks Collisions")]
-    [SerializeField] Transform groundCheckTransform;
     [SerializeField] Transform bottomWallCheckTransform;
     [SerializeField] Transform ledgeCheckTransform;
-    [SerializeField] Transform wallCheckTransform;
-    [SerializeField] Transform ceilingCheckTransform;
-    [SerializeField] float groundCheckRadius;
+    [SerializeField] Transform wallCheck;
+    [SerializeField] Vector2 wallSize;
+    [SerializeField] float groundCheckDistance;
     [SerializeField] float wallCheckDistance;
+    [SerializeField] float ceilingCheckDistance;
     [SerializeField] LayerMask whatIsGround;
 
     private Rigidbody2D rb;
@@ -82,8 +82,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (Input.anyKey && !isKnocked)
-            canRun = true;
+        if (Input.anyKey && !isKnocked) canRun = true;
+
+        if (isGrounded) canDoubleJump = true;
 
         CheckForRun();
         CheckForJump();
@@ -263,17 +264,17 @@ public class Player : MonoBehaviour
 
     private void CheckForCollisions()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, whatIsGround);
-        isBottomWallDetected = Physics2D.Raycast(bottomWallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
-        isCeilingDetected = Physics2D.Raycast(ceilingCheckTransform.position, Vector2.up, wallCheckDistance + 0.5f, whatIsGround); ;
+        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
+        isCeilingDetected = Physics2D.Raycast(transform.position, Vector2.up, ceilingCheckDistance, whatIsGround); ;
+        isWallDetected = Physics2D.BoxCast(wallCheck.position, wallSize, 0, Vector2.zero, 0, whatIsGround);
 
+        isBottomWallDetected = Physics2D.Raycast(bottomWallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
         isTouchingLedge = Physics2D.Raycast(ledgeCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
-        isWallDetected = Physics2D.Raycast(wallCheckTransform.position, Vector2.right, wallCheckDistance, whatIsGround);
 
         if (isWallDetected && !isTouchingLedge && !isLedgeDetected)
         {
             isLedgeDetected = true;
-            ledgePosBot = wallCheckTransform.position;
+            //ledgePosBot = wallCheckTransform.position;
             rb.velocity = new Vector2(rb.velocity.x, 0f);
         }
     }
@@ -287,6 +288,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    //Used by animation
     private void knockbackAnimationFinished()
     {
         isKnocked = false;
@@ -333,17 +335,12 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(groundCheckTransform.position, groundCheckRadius);
         Gizmos.DrawLine(bottomWallCheckTransform.position, new Vector3(bottomWallCheckTransform.position.x + wallCheckDistance, bottomWallCheckTransform.position.y, 
             bottomWallCheckTransform.position.z));
 
-        Gizmos.DrawLine(wallCheckTransform.position, new Vector3(wallCheckTransform.position.x + wallCheckDistance, wallCheckTransform.position.y,
-            wallCheckTransform.position.z));
+        Gizmos.DrawWireCube(wallCheck.position, wallSize);
 
         Gizmos.DrawLine(ledgeCheckTransform.position, new Vector3(ledgeCheckTransform.position.x + wallCheckDistance, ledgeCheckTransform.position.y,
              ledgeCheckTransform.position.z));
-
-        Gizmos.DrawLine(ceilingCheckTransform.position, new Vector3(ceilingCheckTransform.position.x, ceilingCheckTransform.position.y + wallCheckDistance,
-            ceilingCheckTransform.position.z));
     }
 }
